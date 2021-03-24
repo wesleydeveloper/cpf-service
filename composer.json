@@ -1,0 +1,23 @@
+{
+    "name": "wesleydeveloper/cpf-service",
+    "description": "Serviço para consultar a situação cadastral no CPF - RF",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wesley Silva",
+            "email": "wesley_silva@outlook.com",
+            "homepage": "https://wesleydeveloper.github.io"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "fabpot/goutte": "dev-master",
+        "2captcha/2captcha": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wesleydeveloper\\CPFService\\": "src"
+        }
+    }
+}
