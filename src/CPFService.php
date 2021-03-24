@@ -43,7 +43,10 @@ class CPFService
 
     public function __construct(string $twoCaptchaKey)
     {
-        $this->twoCaptcha = new TwoCaptcha($twoCaptchaKey);
+        $this->twoCaptcha = new TwoCaptcha([
+            'apiKey'           => $twoCaptchaKey,
+            'softId'           => 2999
+        ]);
         $this->client = new Client();
         $this->params = [
             'idCheckedReCaptcha' => 'false',
