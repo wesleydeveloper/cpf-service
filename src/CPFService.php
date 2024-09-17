@@ -14,7 +14,7 @@ use TwoCaptcha\TwoCaptcha;
 
 class CPFService
 {
-    private const BASE_URI = 'https://servicos.receita.fazenda.gov.br/servicos/cpf/consultasituacao';
+    private const BASE_URI = 'https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao';
 
     /**
      * @var Client;
@@ -102,7 +102,7 @@ class CPFService
     {
         try {
             $crawler = $this->client->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
-            $siteKey = $crawler->filter('.g-recaptcha')->attr('data-sitekey');
+            $siteKey = $crawler->filter('.h-captcha')->attr('data-sitekey');
             if(is_null($siteKey)) throw new Exception('Site key is null');
             return $siteKey;
         } catch (Exception $e) {
@@ -120,11 +120,11 @@ class CPFService
     {
         try {
             set_time_limit(610);
-            $reCaptcha = $this->twoCaptcha->recaptcha([
+            $reCaptcha = $this->twoCaptcha->hcaptcha([
                 'sitekey' => $this->getSiteKey(),
                 'url' => self::BASE_URI . '/ConsultaPublica.asp'
             ]);
-            $this->params['g-recaptcha-response'] = $reCaptcha->code;
+            $this->params['h-captcha-response'] = $reCaptcha->code;
         } catch (Exception $e) {
             throw $e;
         }
