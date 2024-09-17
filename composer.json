@@ -7,11 +7,12 @@
         {
             "name": "Wesley Silva",
             "email": "wesley_silva@outlook.com",
-            "homepage": "https://wesleydeveloper.github.io"
+            "homepage": "https://lidmo.com.br/blog/author/wesley"
         }
     ],
     "minimum-stability": "dev",
     "require": {
+        "php": "^8.2",
         "fabpot/goutte": "dev-master",
         "2captcha/2captcha": "dev-master"
     },
