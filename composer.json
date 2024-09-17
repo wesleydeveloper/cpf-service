@@ -10,11 +10,14 @@
             "homepage": "https://lidmo.com.br/blog/author/wesley"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {
         "php": "^8.2",
-        "fabpot/goutte": "dev-master",
-        "2captcha/2captcha": "dev-master"
+        "symfony/browser-kit": "^7.1",
+        "2captcha/2captcha": "^1.2",
+        "symfony/http-client": "^7.1",
+        "symfony/css-selector": "^7.1",
+        "symfony/mime": "^7.1"
     },
     "autoload": {
         "psr-4": {

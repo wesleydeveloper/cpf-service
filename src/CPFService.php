@@ -4,7 +4,8 @@
 namespace Wesleydeveloper\CPFService;
 
 use Exception;
-use Goutte\Client;
+use Symfony\Component\BrowserKit\HttpBrowser;
+use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\DomCrawler\Crawler;
 use TwoCaptcha\Exception\ApiException;
 use TwoCaptcha\Exception\NetworkException;
@@ -17,9 +18,9 @@ class CPFService
     private const BASE_URI = 'https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao';
 
     /**
-     * @var Client;
+     * @var HttpBrowser;
      */
-    private Client $client;
+    private HttpBrowser $browser;
 
     /**
      * @var TwoCaptcha
@@ -47,7 +48,7 @@ class CPFService
             'apiKey'           => $twoCaptchaKey,
             'softId'           => 2999
         ]);
-        $this->client = new Client();
+        $this->browser = new HttpBrowser(HttpClient::create());
         $this->params = [
             'idCheckedReCaptcha' => 'false',
             'Enviar' => 'Consultar'
@@ -78,7 +79,7 @@ class CPFService
             $this->params['txtCPF'] = $cpf;
             $this->params['txtDataNascimento'] = $dataNasc;
             $this->resolveCaptcha();
-            $crawler = $this->client->request('POST', self::BASE_URI . '/ConsultaPublicaExibir.asp', $this->params);
+            $crawler = $this->browser->request('POST', self::BASE_URI . '/ConsultaPublicaExibir.asp', $this->params);
             $this->serializeResponse($crawler);
             return count($this->result) > 0;
         }catch (Exception $e){
@@ -101,7 +102,7 @@ class CPFService
     private function getSiteKey(): string
     {
         try {
-            $crawler = $this->client->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
+            $crawler = $this->browser->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
             $siteKey = $crawler->filter('.h-captcha')->attr('data-sitekey');
             if(is_null($siteKey)) throw new Exception('Site key is null');
             return $siteKey;
