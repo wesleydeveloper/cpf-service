@@ -160,7 +160,6 @@ class CPFService
             'sitekey' => $this->getSiteKey(),
             'url' => self::BASE_URI . '/ConsultaPublica.asp'
         ]);
-        var_dump($reCaptcha->code);
         $this->params['h-captcha-response'] = $reCaptcha->code;
     }
 
