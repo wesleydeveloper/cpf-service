@@ -7,6 +7,7 @@ use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Wesleydeveloper\CPFService\CPFService;
+use Wesleydeveloper\CPFService\DTO\CpfResultDTO;
 
 class CPFServiceResultTest extends TestCase
 {
@@ -39,7 +40,7 @@ HTML;
         $mockHttpClient = new MockHttpClient($responses);
         $browser = new HttpBrowser($mockHttpClient);
 
-        $service = new CPFService('fake-captcha-key', $browser);
+        $service = new CPFService('fake-captcha-key', null, $browser);
 
         // Passando um "fake-token" ignoramos a chamada à API do 2captcha no teste
         $isValid = $service->check('11111111111', '23/09/1991', 'fake-token');
@@ -49,13 +50,12 @@ HTML;
         // Validação do getResult()
         $result = $service->getResult();
 
-        $this->assertIsArray($result);
-        $this->assertCount(6, $result);
-        $this->assertEquals('111.111.111-11', $result['numero']);
-        $this->assertEquals('WESLEY SILVA', $result['nome']);
-        $this->assertEquals('23/09/1991', $result['dataNasc']);
-        $this->assertEquals('REGULAR', $result['situacao']);
-        $this->assertEquals('01/01/2010', $result['dataInsc']);
-        $this->assertEquals('00', $result['digVerificador']);
+        $this->assertInstanceOf(CpfResultDTO::class, $result);
+        $this->assertEquals('111.111.111-11', $result->numero);
+        $this->assertEquals('WESLEY SILVA', $result->nome);
+        $this->assertEquals('23/09/1991', $result->dataNasc);
+        $this->assertEquals('REGULAR', $result->situacao);
+        $this->assertEquals('01/01/2010', $result->dataInsc);
+        $this->assertEquals('00', $result->digVerificador);
     }
 }

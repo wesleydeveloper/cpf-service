@@ -7,7 +7,7 @@ use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Wesleydeveloper\CPFService\CPFService;
-use Exception;
+use Wesleydeveloper\CPFService\Exception\ReceitaFederalConnectionException;
 
 class CPFServiceFirewallTest extends TestCase
 {
@@ -21,11 +21,11 @@ class CPFServiceFirewallTest extends TestCase
         $browser = new HttpBrowser($mockHttpClient);
 
         // Inject the mocked browser into the CPFService
-        $service = new CPFService('fake-captcha-key', $browser);
+        $service = new CPFService('fake-captcha-key', null, $browser);
 
         // Assert that the specific firewall exception is thrown
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Possível bloqueio de firewall ou erro SSL/TLS');
+        $this->expectException(ReceitaFederalConnectionException::class);
+        $this->expectExceptionMessage('Erro de conexão com a Receita Federal');
 
         $service->check('11111111111', '01011990', 'fake-token');
     }
