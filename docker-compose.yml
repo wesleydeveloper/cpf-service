@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cpf-service-app
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    # Executamos o tail para manter o container rodando em background
+    # facilitando o uso de comandos como: docker compose exec app composer test
+    command: tail -f /dev/null
+
+  # Serviço dedicado apenas para rodar os testes e finalizar
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cpf-service-test
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    command: vendor/bin/phpunit

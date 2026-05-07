@@ -1,0 +1,1 @@
+{"version":2,"defects":[],"times":{"Wesleydeveloper\\CPFService\\Tests\\CPFServiceTest::test_can_instantiate_service":0.004,"Wesleydeveloper\\CPFService\\Tests\\CPFServiceFirewallTest::test_it_handles_firewall_or_ssl_block_gracefully":0.027,"Wesleydeveloper\\CPFService\\Tests\\CPFServiceResultTest::test_it_correctly_parses_the_result_from_receita_federal":0.018}}

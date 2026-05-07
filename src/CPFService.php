@@ -7,6 +7,7 @@ use Exception;
 use Symfony\Component\BrowserKit\HttpBrowser;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use TwoCaptcha\Exception\ApiException;
 use TwoCaptcha\Exception\NetworkException;
 use TwoCaptcha\Exception\TimeoutException;
@@ -42,13 +43,24 @@ class CPFService
      */
     private array $keys;
 
-    public function __construct(string $twoCaptchaKey)
+    public function __construct(string $twoCaptchaKey, ?HttpBrowser $browser = null)
     {
         $this->twoCaptcha = new TwoCaptcha([
             'apiKey' => $twoCaptchaKey,
             'softId' => 2999
         ]);
-        $this->browser = new HttpBrowser(HttpClient::create());
+        
+        if ($browser === null) {
+            $options = [];
+            $proxyUrl = getenv('PROXY_URL');
+            if ($proxyUrl) {
+                $options['proxy'] = $proxyUrl;
+            }
+            // Utilizamos o NativeHttpClient para contornar o bug "unexpected eof while reading" do OpenSSL 3 no cURL
+            $browser = new HttpBrowser(new \Symfony\Component\HttpClient\NativeHttpClient($options));
+        }
+
+        $this->browser = $browser;
 
         $this->params = [
             'idCheckedReCaptcha' => 'false',
@@ -77,9 +89,13 @@ class CPFService
      * @throws ValidationException
      * @throws Exception
      */
-    public function check(string $cpf, string $dataNasc, string $token = null, string $http_user_agent = null): bool
+    public function check(string $cpf, string $dataNasc, ?string $token = null, ?string $http_user_agent = null): bool
     {
-        $this->browser->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
+        try {
+            $this->browser->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
+        } catch (TransportExceptionInterface $e) {
+            throw new Exception('Erro de conexão com a Receita Federal (Possível bloqueio de firewall ou erro SSL/TLS): ' . $e->getMessage(), 0, $e);
+        }
 
         $this->browser->setServerParameters([
             'HTTP_USER_AGENT' => $http_user_agent ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -99,7 +115,11 @@ class CPFService
             $this->params['idCheckedReCaptcha'] = 'false';
         }
 
-        $crawler = $this->browser->request('POST', self::BASE_URI . '/ConsultaPublicaExibir.asp', $this->params);
+        try {
+            $crawler = $this->browser->request('POST', self::BASE_URI . '/ConsultaPublicaExibir.asp', $this->params);
+        } catch (TransportExceptionInterface $e) {
+            throw new Exception('Erro de conexão com a Receita Federal (Possível bloqueio de firewall ou erro SSL/TLS): ' . $e->getMessage(), 0, $e);
+        }
 
         $errorMessage = '';
 
@@ -140,7 +160,11 @@ class CPFService
      */
     private function getSiteKey(): string
     {
-        $crawler = $this->browser->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
+        try {
+            $crawler = $this->browser->request('GET', self::BASE_URI . '/ConsultaPublica.asp');
+        } catch (TransportExceptionInterface $e) {
+            throw new Exception('Erro de conexão com a Receita Federal (Possível bloqueio de firewall ou erro SSL/TLS): ' . $e->getMessage(), 0, $e);
+        }
         $siteKey = $crawler->filter('.h-captcha')->attr('data-sitekey');
         if (is_null($siteKey)) throw new Exception('Site key is null');
         return $siteKey;
