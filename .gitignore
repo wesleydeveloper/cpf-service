@@ -2,3 +2,4 @@
 vendor
 examples
 composer.lock
+.env
